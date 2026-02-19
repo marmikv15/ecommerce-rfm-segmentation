@@ -43,21 +43,21 @@ print("E-COMMERCE CUSTOMER SEGMENTATION — RFM ANALYSIS")
 print("Business Analyst: Marmik Vyas")
 print("=" * 65)
 
-# ─── STEP 1: DATA GENERATION ─────────────────────────────────────
+# ─── DATA GENERATION ─────────────────────────────────────
 np.random.seed(99)
 n_customers = 2000
 
-# Simulate realistic customer behaviour
+
 customer_ids = [f'CUST-{str(i).zfill(5)}' for i in range(1, n_customers + 1)]
 countries = np.random.choice(['UK', 'Germany', 'France', 'Spain', 'Netherlands', 'Belgium'],
                               n_customers, p=[0.60, 0.15, 0.10, 0.07, 0.05, 0.03])
 
-# Create transaction-level data (multiple orders per customer)
+
 transactions = []
 reference_date = datetime(2024, 12, 31)
 
 for i, (cid, country) in enumerate(zip(customer_ids, countries)):
-    # Customer type segmentation built into data generation
+    
     ctype = np.random.choice(['champion', 'loyal', 'at_risk', 'lost', 'new'],
                               p=[0.15, 0.25, 0.25, 0.20, 0.15])
 
@@ -97,7 +97,7 @@ print(f"   → Total Transactions: {len(df_trans):,}")
 print(f"   → Unique Customers:   {df_trans['CustomerID'].nunique():,}")
 print(f"   → Date Range:         {df_trans['OrderDate'].min().date()} to {df_trans['OrderDate'].max().date()}")
 
-# ─── STEP 2: RFM CALCULATION ──────────────────────────────────────
+# ───RFM CALCULATION ──────────────────────────────────────
 print("\n" + "─" * 65)
 print("SECTION 1: RFM SCORE CALCULATION")
 print("─" * 65)
@@ -111,14 +111,14 @@ rfm = df_trans.groupby('CustomerID').agg(
 
 rfm['Monetary'] = rfm['Monetary'].round(2)
 
-# Score each dimension 1-5 (5 = best)
+
 rfm['R_Score'] = pd.qcut(rfm['Recency'], q=5, labels=[5, 4, 3, 2, 1]).astype(int)
 rfm['F_Score'] = pd.qcut(rfm['Frequency'].rank(method='first'), q=5, labels=[1, 2, 3, 4, 5]).astype(int)
 rfm['M_Score'] = pd.qcut(rfm['Monetary'], q=5, labels=[1, 2, 3, 4, 5]).astype(int)
 rfm['RFM_Score'] = rfm['R_Score'] * 100 + rfm['F_Score'] * 10 + rfm['M_Score']
 rfm['RFM_Total'] = rfm['R_Score'] + rfm['F_Score'] + rfm['M_Score']
 
-# ─── STEP 3: CUSTOMER SEGMENTATION ────────────────────────────────
+# ───CUSTOMER SEGMENTATION ────────────────────────────────
 def assign_segment(row):
     r, f, m = row['R_Score'], row['F_Score'], row['M_Score']
     total = row['RFM_Total']
@@ -156,7 +156,7 @@ print("\nCustomer Segment Summary:")
 print(segment_summary[['Customer_Count', 'Pct_Customers', 'Avg_Recency', 'Avg_Frequency',
                          'Avg_Monetary', 'Total_Revenue', 'Pct_Revenue']].to_string())
 
-# ─── STEP 4: RETENTION STRATEGY MAPPING (BA DELIVERABLE) ─────────
+# ───RETENTION STRATEGY MAPPING (BA DELIVERABLE) ─────────
 print("\n" + "─" * 65)
 print("SECTION 2: SEGMENT-TO-ACTION MAPPING (BA Deliverable)")
 print("─" * 65)
@@ -183,7 +183,7 @@ strategies = {
 strat_df = pd.DataFrame(strategies).T
 print(strat_df.to_string())
 
-# ─── STEP 5: VISUALIZATIONS ───────────────────────────────────────
+# ───VISUALIZATIONS ───────────────────────────────────────
 fig = plt.figure(figsize=(20, 15))
 fig.suptitle('E-Commerce Customer Segmentation — RFM Analysis Dashboard\nBusiness Analyst: Marmik Vyas',
              fontsize=16, fontweight='bold', y=0.98)
